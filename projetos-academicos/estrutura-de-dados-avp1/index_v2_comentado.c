@@ -22,14 +22,14 @@ const char* resetarCor() { return "\033[m"; }
 
 void menuOpcoes() { // Função que exibe o menu de opções
 
-    printf("%s============= %sMENU %s=============%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
+    printf("%s<================< %sMENU %s>================>%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
 
     printf("%s[ 1 ] %sAdicionar cliente\n", corAmarela(), corVerde());
     printf("%s[ 2 ] %sRemover cliente\n", corAmarela(), corVerde());
     printf("%s[ 3 ] %sVer lista de clientes\n", corAmarela(), corVerde());        
     printf("%s[ 4 ] %sEncerrar programa\n", corAmarela(), corVermelha());
 
-    printf("%s================================%s\n", corRoxa(), resetarCor());
+    printf("%s<===================%s<>%s===================>%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
 
 }
 
@@ -72,15 +72,15 @@ void erroOpcaoInexistente(int opcao) { // Função que exibe mensagem de erro do
 }
 
 void linhaAdicionarCliente() { // Função que exibe linhas delimitadoras para o menu de "Adicionar cliente"
-    printf("%s======================================%s\n", corRoxa(), resetarCor());
+    printf("%s<===================%s<>%s====================>%s\n", corAzulClaro(), corAmarela(), corAzulClaro(), resetarCor());
 }
 
 void linhaRemoverCliente() { // Função que exibe linhas delimitadoras para o menu de "Remover cliente"
-    printf("%s===================================%s\n", corRoxa(), resetarCor());
+    printf("%s<===================%s<>%s====================>%s\n", corAzulClaro(), corVermelha(), corAzulClaro(), resetarCor());
 }
 
 void linhaListarClientes() { // Função que exibe linhas delimitadoras para o menu de "Listar clientes"
-    printf("%s=====================================%s\n", corRoxa(), resetarCor());
+    printf("%s<====================%s<>%s===================>%s\n", corAmarela(), corVerde(), corAmarela(), resetarCor());
 }
 
 void limparBuffer() { // Função sem retorno que "limpa" o buffer de entrada até que a linha inteira seja consumida, ou seja, até que o usuário pressione "Enter". Isso é útil para garantir que qualquer entrada residual (como caracteres extras ou espaços) seja descartada antes de continuar o programa.
@@ -95,9 +95,10 @@ void adicionarCliente(char lista_clientes[101][50], int *indice) { // Função s
 
     char cliente[50];
 
-    printf("%s========= %sADICIONAR CLIENTE %s=========%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
+    printf("%s<==========< %sADICIONAR CLIENTE %s>==========>%s\n", corAzulClaro(), corAmarela(), corAzulClaro(), resetarCor());
 
-    printf("Nome do cliente %s(digite 'sair' para cancelar)%s: ", corCinza(), corAzulEscuro());
+    printf("%s(!) digite 'sair' para cancelar a acao%s\n", corCinza(), resetarCor());
+    printf("Nome do cliente%s: ", corAzulEscuro());
 
     fgets(cliente, sizeof(cliente), stdin); // Consegue pegar o nome    completo do cliente
 
@@ -122,7 +123,7 @@ void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem
 
     int id_cliente_remover;
 
-    printf("%s========= %sREMOVER CLIENTE %s=========%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
+    printf("%s<===========< %sREMOVER CLIENTE %s>===========>%s\n", corAzulClaro(), corVermelha(), corAzulClaro(), resetarCor());
 
     int repetir_titulo = 0; // Flag para verificar se é preciso repitir o título se o loop de validação der erro... a pricípio será 'Falso' porque se caso não for, o título "REMOVER CLIENTES" seria printado 2x ,uma no começo do case 2, e outra ao entrar no while de validação
 
@@ -131,10 +132,10 @@ void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem
         while (1) { // Entra em um loop while de validacao
 
             if (repetir_titulo) { // Se for a primeira vez, esse if é ignorado, porém se houver erro, será printado  
-                printf("%s========= %sREMOVER CLIENTE %s=========%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
+                printf("%s<===========< %sREMOVER CLIENTE %s>===========>%s\n", corAzulClaro(), corVermelha(), corAzulClaro(), resetarCor());
             }
 
-            printf("%s%-5s %-20s%s\n", corAmarela(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
+            printf("%s%-5s %-20s%s\n", corCinza(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
 
             for (int i = 1; i < *indice; i++) { // Percorre pelo array LISTA_CLIENTES e exibe seus IDs e nomes, tabulados com as mesmas especificações anterioras, porém para conceber os dados
                 printf("%s%-5d %s%-5s\n", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
@@ -142,7 +143,9 @@ void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem
 
             linhaRemoverCliente(); // Exibe um linha roxa
 
-            printf("%sInsira o Id corresponte ao cliente que deseja remover %s(Digite '0' para cancelar)%s: ", resetarCor(), corCinza(), corVermelha());
+            printf("%s(!) Digite '0' para cancelar a acao%s\n", corCinza(), resetarCor());
+
+            printf("Digite o Id corresponte ao cliente que deseja remover%s: ", corVermelha());
             scanf("%d", &id_cliente_remover); // Pega o id do cliente no qual sera removido
 
             if (id_cliente_remover != 0) { // Caso o id digitado não for '0', a função desempenha sua tarefa, se não , passa direto
@@ -201,11 +204,11 @@ void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem
 
 void listarClientes(char lista_clientes[101][50], int indice) { // Função sem retorno (void) que lista o nome dos clientes na lista de clientes... Nela há dois parâmetros, o "char lista_clientes[101][50]" que recebe a lista dos clientes e o "int indice", que é para receber o índice do int main()... perceba que "int indice" não está com ponteiro, pois nesse caso não haverá incremento ou decremento nela, apenas será lido o valor 
 
-    printf("%s========= %sLISTA DE CLIENTES %s=========%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
+    printf("%s<==========< %sLISTA DE CLIENTES %s>==========>%s\n", corAmarela(), corVerde(), corAmarela(), resetarCor());
 
     if (indice > 1) { // Caso exista clientes para exibir seus nomes IDs e nomes;
 
-        printf("%s%-5s %-20s%s\n", corAmarela(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
+        printf("%s%-5s %-20s%s\n", corCinza(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
         for (int i = 1; i < indice; i++) { // Percorre pelo array LISTA_CLIENTES e exibe seus IDs e nomes, tabulados com as mesmas especificações anterioras, porém para conceber os dados
             printf("%s%-5d %s%-5s\n", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
         }
@@ -226,13 +229,7 @@ void listarClientes(char lista_clientes[101][50], int indice) { // Função sem 
 
 int encerrarPrograma(int confirmar_encerrar, int confirmar_encerrar_valido, int continuar) { // Função com retorno que desempenha o processo de encerrar o programa, no caso ela irá retorna um número inteiro de valor '1' (true) ou '0' (false) que servirá como verificação depois
 
-    while (1) { // Loop while de validação
-
-        continuar = 0; // Uma flag que servirá como veficação no final
-
-        confirmar_encerrar_valido = 0; // Inicializo como inválida para depois se for válida se tornar válida (verificação que a tornará ou não)
-
-        // Para esse caso: (0 = false ; 1 = true) , não existe boolean em C 
+    while (1) { // Loop while de validação 
 
         while (!confirmar_encerrar_valido) { // Loop while de validação que só sairá caso a variável 'confirmar_encerrar_valido' se torne 1 (true)
 
@@ -346,6 +343,12 @@ int main(int argc, char *argv[]) { // Esse "int argc, char *argv[]" em um breve 
                 break; // Quebra o case do switch
 
             } default: { // Opcao de encerrar o programa
+
+                continuar = 0; // Uma flag que servirá como veficação no final
+                confirmar_encerrar_valido = 0; // Inicializo como inválida para depois se for válida se tornar válida (verificação que a tornará ou não)
+                confirmar_encerrar = 0; // Inicializo como inválida para depois se for válida se tornar válida (verificação que a tornará ou não)
+
+                // Para esse caso: (0 = false ; 1 = true) , não existe boolean em C
 
                 continuar = encerrarPrograma(confirmar_encerrar, confirmar_encerrar_valido, continuar); // Aqui a variável 'continuar' vai receber o retorno da função que será ou '1' (true) ou '0' (false)
 
