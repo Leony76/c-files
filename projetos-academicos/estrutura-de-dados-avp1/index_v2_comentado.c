@@ -83,25 +83,39 @@ void linhaListarClientes() { // Função que exibe linhas delimitadoras para o m
     printf("%s=====================================%s\n", corRoxa(), resetarCor());
 }
 
+void limparBuffer() { // Função sem retorno que "limpa" o buffer de entrada até que a linha inteira seja consumida, ou seja, até que o usuário pressione "Enter". Isso é útil para garantir que qualquer entrada residual (como caracteres extras ou espaços) seja descartada antes de continuar o programa.
+    while (getchar() != '\n');
+}
+
+void removerBarraZero(char str[]) { // Função sem retorno que remove o '\0' que todo cadeida de caractres em C possui, para possibilitar comparação de o valor de um string caso necessário 
+    str[strcspn(str, "\n")] = 0;
+}
+
 void adicionarCliente(char lista_clientes[101][50], int *indice) { // Função sem retorno (void) que adiciona o nome do cliente na lista de clientes... Nela há dois parâmetros, o "char lista_clientes[101][50]" que recebe a lista dos clientes e o "int *indice", que é para receber o índice com ponteiro apontando para a variável "indice" na função "int main(), para que seja possível alterar o valor dela a partir dessa função"
 
     char cliente[50];
 
     printf("%s========= %sADICIONAR CLIENTE %s=========%s\n", corRoxa(), corAzulClaro(), corRoxa(), resetarCor());
 
-    printf("Nome do cliente%s: ", corAzulEscuro());
-    fgets(cliente, sizeof(cliente), stdin); // Consegue pegar o nome completo do cliente
+    printf("Nome do cliente %s(digite 'sair' para cancelar)%s: ", corCinza(), corAzulEscuro());
 
-    printf("%s>>> Cliente adicionado com sucesso! <<<%s\n", corVerde(), resetarCor());
+    fgets(cliente, sizeof(cliente), stdin); // Consegue pegar o nome    completo do cliente
 
-    strcpy(lista_clientes[*indice], cliente); // Copia o nome do cliente inserido em CLIENTE para o array de LISTA_CLIENTES, na posição do indice corresponde
+    removerBarraZero(cliente); // Remove o '\0' presente no que for digitado na variável 'cliente' para viabilizar uma comparação com 'strcmp'
 
-    (*indice)++; // Incrementa +1 no indice apontado no int main()
+    if (strcmp(cliente, "sair") != 0) { // Se o que foi digitado não for 'sair', a função desempenha seu propósito, se não, passa direto
 
-    linhaAdicionarCliente();
+        printf("%s>>> Cliente adicionado com sucesso! <<<%s\n", corVerde(), resetarCor());
 
-    prosseguir();
+        strcpy(lista_clientes[*indice], cliente); // Copia o nome do cliente inserido em CLIENTE para o array de LISTA_CLIENTES, na posição do indice corresponde
     
+        (*indice)++; // Incrementa +1 no indice apontado no int main()
+        
+        linhaAdicionarCliente(); // Exibe um linha roxa
+    
+        prosseguir(); // Função que para o fluxo do programa até que seja pressionado 'enter'
+    }
+
 }
 
 void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem retorno (void) que remove o nome do cliente na lista de clientes... Nela há dois parâmetros, o "char lista_clientes[101][50]" que recebe a lista dos clientes e o "int *indice", que é para receber o índice com ponteiro apontando para a variável "indice" na função "int main(), para que seja possível alterar o valor dela a partir dessa função"
@@ -123,49 +137,63 @@ void removerCliente(char lista_clientes[101][50], int *indice) { // Função sem
             printf("%s%-5s %-20s%s\n", corAmarela(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
 
             for (int i = 1; i < *indice; i++) { // Percorre pelo array LISTA_CLIENTES e exibe seus IDs e nomes, tabulados com as mesmas especificações anterioras, porém para conceber os dados
-                printf("%s%-5d %s%-5s", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
+                printf("%s%-5d %s%-5s\n", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
             }   
 
-            linhaRemoverCliente();
+            linhaRemoverCliente(); // Exibe um linha roxa
 
-            printf("%sInsira o Id corresponte ao cliente que deseja remover%s: ", resetarCor(), corVermelha());
+            printf("%sInsira o Id corresponte ao cliente que deseja remover %s(Digite '0' para cancelar)%s: ", resetarCor(), corCinza(), corVermelha());
             scanf("%d", &id_cliente_remover); // Pega o id do cliente no qual sera removido
 
-            if (id_cliente_remover > 0 && id_cliente_remover < *indice) { // Confere se o Id é válido dentre os listados, se sim, sai do loop while de validacao
+            if (id_cliente_remover != 0) { // Caso o id digitado não for '0', a função desempenha sua tarefa, se não , passa direto
 
-                while (getchar() != '\n'); // Limpa o buffer
+                if ((id_cliente_remover > 0) && (id_cliente_remover < *indice)) { // Confere se o Id é válido dentre os listados, se sim, sai do loop while de validacao
 
+                    limparBuffer(); // Limpa o buffer
+    
+                    break;
+    
+                } else { // Se não, persiste até que seja valido
+    
+                    erroIdInvalido(); // Exibe uma mensagem de erro do tipo "Id inválido"
+    
+                    limparBuffer(); // Limpa o buffer
+    
+                    repetir_titulo = 1; // Equivalente a 'True', o que faz com que o título "REMOVER CLIENTES" seja repetido no próximo loop
+    
+                }
+
+            }
+
+            if (id_cliente_remover == 0) { // Caso for digitado '0' (cancelar ação), quebra loop while
                 break;
-            } else { // Se não, persiste até que seja valido
+            }
 
-                erroIdInvalido();
-
-                while (getchar() != '\n'); // Limpa o buffer
-
-                repetir_titulo = 1; // Equivalente a 'True', o que faz com que o título "REMOVER CLIENTES" seja repetido no próximo loop
-
-            } 
         }
 
-        for (int i = id_cliente_remover; i < *indice - 1; i++) { // Desloca os clientes para "remover" o cliente no índice id_cliente_remover
-            strcpy(lista_clientes[i], lista_clientes[i + 1]);
-        }
+        if (id_cliente_remover != 0) { // Caso 'id_cliente_remover' for diferente de '0', o resto do fluxo do programa segue normalmente, se não, é ignorado  
 
-        (*indice)--; // Índice apontado do int main() é decrementado, pois um cliente foi removido
+            for (int i = id_cliente_remover; i < *indice - 1; i++) { // Desloca os clientes para "remover" o cliente no índice id_cliente_remover
+                strcpy(lista_clientes[i], lista_clientes[i + 1]);
+            }
+    
+            (*indice)--; // Índice apontado do int main() é decrementado, pois um cliente foi removido
+    
+            printf("%s>>> Cliente removido com sucesso! <<<%s\n", corVerde(), resetarCor());
+    
+            linhaRemoverCliente(); // Exibe um linha roxa
+    
+            prosseguir(); // Função que para o fluxo do programa até que seja pressionado 'enter'
 
-        printf("%s>>> Cliente removido com sucesso! <<<%s\n", corVerde(), resetarCor());
-
-        linhaRemoverCliente();
-
-        prosseguir();
+        } 
 
     } else { // Caso não exista
 
-        erroSemClientesRemocao();
+        erroSemClientesRemocao(); // Exibe uma mensagem de erro exclarecendo que não há clientes na lista para remoção
 
-        linhaRemoverCliente();
+        linhaRemoverCliente(); // Exibe um linha roxa
 
-        prosseguir();
+        prosseguir(); // Função que para o fluxo do programa até que seja pressionado 'enter'
 
     }
     
@@ -179,20 +207,74 @@ void listarClientes(char lista_clientes[101][50], int indice) { // Função sem 
 
         printf("%s%-5s %-20s%s\n", corAmarela(), "Id", "Cliente", resetarCor()); // Tabula ID com 5 espaços alinhados a esquerda e CLIENTE 20 espaços alinhados a esquerda
         for (int i = 1; i < indice; i++) { // Percorre pelo array LISTA_CLIENTES e exibe seus IDs e nomes, tabulados com as mesmas especificações anterioras, porém para conceber os dados
-            printf("%s%-5d %s%-5s", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
+            printf("%s%-5d %s%-5s\n", corVermelha(), i, corAzulEscuro(), lista_clientes[i]);
         }
 
-        linhaListarClientes();
+        linhaListarClientes(); // Exibe um linha roxa
 
     } else { // Caso não exista
 
-        erroSemClientes();
+        erroSemClientes(); // Exibe uma mensagem de erro exclarecendo que nã há clientes na lista
 
-        linhaListarClientes();
+        linhaListarClientes(); // Exibe um linha roxa
 
     }
 
-    prosseguir();
+    prosseguir(); // Função que para o fluxo do programa até que seja pressionado 'enter'
+
+}
+
+int encerrarPrograma(int confirmar_encerrar, int confirmar_encerrar_valido, int continuar) { // Função com retorno que desempenha o processo de encerrar o programa, no caso ela irá retorna um número inteiro de valor '1' (true) ou '0' (false) que servirá como verificação depois
+
+    while (1) { // Loop while de validação
+
+        continuar = 0; // Uma flag que servirá como veficação no final
+
+        confirmar_encerrar_valido = 0; // Inicializo como inválida para depois se for válida se tornar válida (verificação que a tornará ou não)
+
+        // Para esse caso: (0 = false ; 1 = true) , não existe boolean em C 
+
+        while (!confirmar_encerrar_valido) { // Loop while de validação que só sairá caso a variável 'confirmar_encerrar_valido' se torne 1 (true)
+
+            printf("%sConfirma Sair?%s: (1 = sim / 0 = nao)%s ", corAmarela(), corRoxa(), corVermelha());
+
+            if (scanf("%d", &confirmar_encerrar) == 1) { // Se a opção inserida for válida
+
+                confirmar_encerrar_valido = 1; // A variável se torna 1, ou true, equivalente a opção válida e, nesse caso, o loop quebra
+
+                limparBuffer(); // Limpa o buffer
+
+            } else {
+
+                erroOpcaoInvalida(); // Exibe uma mensagem de erro do tipo "Opção inválida"
+
+                limparBuffer(); // Limpa o buffer
+
+            }       
+        }
+
+        if ((confirmar_encerrar >= 0) && (confirmar_encerrar < 2)) { // Só será validado se for digitado 1 ou 0
+
+            if (confirmar_encerrar == 1) { // Se for digitado 1, O programa se encerra de fato
+
+                printf("%s<<< Programa Encerrado! >>>%s\n", corVermelha(), resetarCor());
+
+                return continuar; // A função retorna a variável 'continuar' com valor 0 (false)
+
+            } else {
+
+                continuar = 1; // Se for digitado 0, a variável 'continuar' se torna 'true', o que imperdirá o encerramento do laço posteriormente 
+
+                return continuar; // A função retorna a variável 'continuar' com valor 0 (false)
+
+            }
+        } else {
+
+            erroOpcaoInvalida(); // Exibe uma mensagem de erro do tipo "Opção inválida"
+
+        }
+
+    }
 
 }
 
@@ -217,94 +299,68 @@ int main(int argc, char *argv[]) { // Esse "int argc, char *argv[]" em um breve 
                 printf("%sSua opcao%s: ", corCinza(), corAmarela());
 
                 if (scanf("%d", &opcao) == 1) { // Se a opção inserida for válida
+
                     opcao_valida = 1; // A variável se torna 1, ou true,equivalente a opção válida e, nesse caso, o loop quebra
-                    while (getchar() != '\n'); // Limpa o buffer
+                    
+                    limparBuffer(); // Limpa o buffer
+
                 } else { // Caso não for válida
 
-                    erroOpcaoInvalida();
+                    erroOpcaoInvalida(); // Exibe uma mensagem de erro do tipo "Opção inválida"
 
-                    while (getchar() != '\n'); // Limpa o buffer
+                    limparBuffer(); // Limpa o buffer
                     
                 }
             }
 
             if (opcao > 0 && opcao < 5) {// Somente valida se a opção escolhida estiver no intervalo de uma das 4 do menu
+
                 break; // Quebra o loop while e o programa transcorre
+
             } else { // Caso contrário, exibe erro
 
-                erroOpcaoInexistente(opcao);
+                erroOpcaoInexistente(opcao); // Exibe uma mensagem de erro do tipo "Opção inexistente"
 
             }
+
         }
 
         switch (opcao) { // Verifica qual opcao escolhida e acessa a função de acordo
+
             case 1: { // Opcao de adicionar cliente
 
                 adicionarCliente(lista_clientes, &indice);
 
-                break;
+                break; // Quebra o case do switch
 
             } case 2: { // Opcao de remover cliente
 
                 removerCliente(lista_clientes, &indice);
 
-                break;
+                break; // Quebra o case do switch
+
             } case 3: { // Opcao de ver lista de clientes
 
                 listarClientes(lista_clientes, indice);
 
-                break;
+                break; // Quebra o case do switch
 
             } default: { // Opcao de encerrar o programa
 
-                while (1) { // Loop while de validação
-                    continuar = 0; // Uma flag que servirá como veficação no final
-                    confirmar_encerrar_valido = 0; // Inicializo como inválida para depois se for válida se tornar válida (verificação que a tornará ou não)
+                continuar = encerrarPrograma(confirmar_encerrar, confirmar_encerrar_valido, continuar); // Aqui a variável 'continuar' vai receber o retorno da função que será ou '1' (true) ou '0' (false)
 
-                    // Para esse caso: (0 = false ; 1 = true) , não existe boolean em C 
+                break; // Quebra o case do switch
 
-                    while (!confirmar_encerrar_valido) {
-
-                        printf("%sConfirma Sair?%s: Digite (1 = sim / 0 = nao)%s ", corAmarela(), corRoxa(), corVermelha());
-
-                        if (scanf("%d", &confirmar_encerrar) == 1) { // Se a opção inserida for válida
-
-                            confirmar_encerrar_valido = 1; // A variável se torna 1, ou true,equivalente a opção válida e, nesse caso, o loop quebra
-
-                            while (getchar() != '\n');
-
-                        } else {
-
-                            erroOpcaoInvalida();
-
-                            while (getchar() != '\n'); // Limpa o buffer
-
-                        }       
-                    }
-
-                    if ((confirmar_encerrar == 1) || (confirmar_encerrar == 0)) { // Só será validado se for 1 ou 0
-                        if (confirmar_encerrar == 1) {
-                            printf("%s<<< Programa Encerrado! >>>%s\n", corVermelha(), resetarCor());
-
-                            break;
-                        } else {
-                            continuar = 1;
-                            break; 
-                        }
-                    } else {
-
-                        erroOpcaoInvalida();
-
-                        while (getchar() != '\n');
-
-                    }
-                }  
             }
+
         }
 
-        if ((opcao == 4) && (!continuar)) { // Encerra o programa se opção for 4 e confirmar que queria encerrar
-            break;
+        if ((opcao == 4) && (!continuar)) { // Encerra o programa se opção escolhida no menu for 4 e se houver confirmação que queria encerrar (No caso se a variável 'continuar' tiver resultado 0 (false))
+
+            break; // Quebra o loop while principal do código e o pragrama se encerra
+
         }
+
     }
 
     return 0; // Retorna 0 para indicar que o programa encerrou-se sem erros
