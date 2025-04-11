@@ -148,7 +148,7 @@ int main () {
 
                 confirmar_encerramento = tolower(confirmar_encerramento);
 
-                if (confirmar_encerramento == 's' || confirmar_encerramento == 's') {
+                if (confirmar_encerramento == 's' || confirmar_encerramento == 'n') {
                     if (confirmar_encerramento == 's') {
                         printf("\033[1;30;41m   >>> (!) Programa encerrado <<<  \033[m\n");
                     } 
